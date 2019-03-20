@@ -21,39 +21,18 @@ import pl.com.bottega.ecommerce.sharedkernel.Money;
 
 public class BookKeeper {
 
-    public Invoice issuance(ClientData client, List<RequestItem> items) {
-        Invoice invoice = InvoiceFactory.create(client);
+    private TaxCalculator taxCalculator;
 
-        for (RequestItem item : items) {
-            Money net = item.getTotalCost();
-            BigDecimal ratio = null;
-            String desc = null;
+    public void setTaxCalculator(TaxCalculator taxCalculator) {
+        this.taxCalculator = taxCalculator;
+    }
 
-            switch (item.getProductData()
-                        .getType()) {
-                case FOOD:
-                    ratio = BigDecimal.valueOf(0.07);
-                    desc = "7% (F)";
-                    break;
-                case STANDARD:
-                    ratio = BigDecimal.valueOf(0.23);
-                    desc = "23%";
-                    break;
-                case DRUG:
-                    ratio = BigDecimal.valueOf(0.05);
-                    desc = "5% (D)";
-                    break;
-                default:
-                    throw new IllegalArgumentException(item.getProductData()
-                                                           .getType()
-                                                       + " not handled");
-            }
+    public Invoice issuance(InvoiceRequest invoiceRequest) {
+        Invoice invoice = InvoiceFactory.create(invoiceRequest.getClient());
 
-            Money taxValue = net.multiplyBy(ratio);
-
-            Tax tax = new Tax(taxValue, desc);
-
-            InvoiceLine invoiceLine = new InvoiceLine(item.getProductData(), item.getQuantity(), net, tax);
+        for (RequestItem item : invoiceRequest.getItems()) {
+            Tax tax = taxCalculator.calculate(item);
+            InvoiceLine invoiceLine = new InvoiceLine(item.getProductData(), item.getQuantity(), item.getTotalCost(), tax);
             invoice.addItem(invoiceLine);
         }
 
