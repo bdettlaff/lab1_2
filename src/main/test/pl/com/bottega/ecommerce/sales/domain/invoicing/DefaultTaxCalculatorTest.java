@@ -13,6 +13,7 @@ import java.util.Date;
 
 import static org.junit.Assert.*;
 import static pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType.FOOD;
+import static pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType.STANDARD;
 
 public class DefaultTaxCalculatorTest {
 
@@ -34,6 +35,16 @@ public class DefaultTaxCalculatorTest {
         Tax tax = defaultTaxCalculator.calculate(item);
 
         assertEquals(tax.getDescription(),"7% (F)");
+    }
+
+    @Test
+    public void shouldReturnTaxDescriptionForStandard(){
+        ProductData productData = new ProductData(Id.generate(), new Money(new BigDecimal(1),Money.DEFAULT_CURRENCY), "Stick", STANDARD, new Date());
+        RequestItem item = new RequestItem(productData,900,new Money(new BigDecimal(1),Money.DEFAULT_CURRENCY));
+
+        Tax tax = defaultTaxCalculator.calculate(item);
+
+        assertEquals(tax.getDescription(),"23%");
     }
 
 
