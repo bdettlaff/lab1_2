@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import static org.junit.Assert.*;
+import static pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType.DRUG;
 import static pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType.FOOD;
 import static pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType.STANDARD;
 
@@ -45,6 +46,16 @@ public class DefaultTaxCalculatorTest {
         Tax tax = defaultTaxCalculator.calculate(item);
 
         assertEquals(tax.getDescription(),"23%");
+    }
+
+    @Test
+    public void shouldReturnTaxDescriptionForDrug(){
+        ProductData productData = new ProductData(Id.generate(), new Money(new BigDecimal(1),Money.DEFAULT_CURRENCY), "Mefedron", DRUG, new Date());
+        RequestItem item = new RequestItem(productData,1000,new Money(new BigDecimal(1),Money.DEFAULT_CURRENCY));
+
+        Tax tax = defaultTaxCalculator.calculate(item);
+
+        assertEquals(tax.getDescription(),"5% (D)");
     }
 
 
