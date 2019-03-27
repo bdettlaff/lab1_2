@@ -12,9 +12,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import static org.junit.Assert.*;
-import static pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType.DRUG;
-import static pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType.FOOD;
-import static pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType.STANDARD;
+import static pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType.*;
 
 public class DefaultTaxCalculatorTest {
 
@@ -58,5 +56,14 @@ public class DefaultTaxCalculatorTest {
         assertEquals(tax.getDescription(),"5% (D)");
     }
 
+    @Test
+    public void shouldReturnIllegalArgumentExceptionForAnyOtherType(){
+        ProductData productData = new ProductData(Id.generate(), new Money(new BigDecimal(1),Money.DEFAULT_CURRENCY), "Mefedron", TOY, new Date());
+        RequestItem item = new RequestItem(productData,1000,new Money(new BigDecimal(1),Money.DEFAULT_CURRENCY));
+
+
+        thrown.expect(IllegalArgumentException.class);
+        defaultTaxCalculator.calculate(item);
+    }
 
 }
